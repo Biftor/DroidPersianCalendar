@@ -19,8 +19,8 @@ public class ShapedListDialog extends PreferenceDialogFragmentCompat {
     protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
         super.onPrepareDialogBuilder(builder);
 
-        final ShapedListPreference listPref = (ShapedListPreference) getPreference();
-        final CharSequence[] entriesValues = listPref.getEntryValues();
+        ShapedListPreference listPref = (ShapedListPreference) getPreference();
+        CharSequence[] entriesValues = listPref.getEntryValues();
 
         int selectDialogLayout = R.layout.select_dialog_singlechoice_material;
 
@@ -33,12 +33,9 @@ public class ShapedListDialog extends PreferenceDialogFragmentCompat {
                 selectDialogLayout, listPref.getEntries());
 
         int index = Arrays.asList(entriesValues).indexOf(listPref.getSelected());
-        builder.setSingleChoiceItems(entriesAdapter, index, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                listPref.setSelected(entriesValues[which].toString());
-                getDialog().dismiss();
-            }
+        builder.setSingleChoiceItems(entriesAdapter, index, (dialog, which) -> {
+            listPref.setSelected(entriesValues[which].toString());
+            getDialog().dismiss();
         });
 
         builder.setPositiveButton("", null);

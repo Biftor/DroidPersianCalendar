@@ -17,7 +17,7 @@ public class PrayerSelectDialog extends PreferenceDialogFragmentCompat {
         super.onPrepareDialogBuilder(builder);
         PrayerSelectPreference prayerspref = (PrayerSelectPreference) getPreference();
 
-        final CharSequence[] entriesKeys = getResources().getStringArray(R.array.prayerTimeKeys);
+        CharSequence[] entriesKeys = getResources().getStringArray(R.array.prayerTimeKeys);
 
         prayers = prayerspref.getPrayers();
 
@@ -26,14 +26,11 @@ public class PrayerSelectDialog extends PreferenceDialogFragmentCompat {
             checked[i] = prayers.contains(entriesKeys[i]);
         }
 
-        builder.setMultiChoiceItems(R.array.prayerTimeNames, checked, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialog, int which,
-                                boolean isChecked) {
-                if (isChecked) {
-                    prayers.add(entriesKeys[which].toString());
-                } else {
-                    prayers.remove(entriesKeys[which].toString());
-                }
+        builder.setMultiChoiceItems(R.array.prayerTimeNames, checked, (dialog, which, isChecked) -> {
+            if (isChecked) {
+                prayers.add(entriesKeys[which].toString());
+            } else {
+                prayers.remove(entriesKeys[which].toString());
             }
         });
     }

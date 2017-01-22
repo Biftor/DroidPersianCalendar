@@ -38,10 +38,10 @@ public class SelectDayDialog extends AppCompatDialogFragment {
         final Utils utils = Utils.getInstance(getContext());
 
         // fill members
-        final Spinner calendarTypeSpinner = (Spinner) view.findViewById(R.id.calendarTypeSpinner);
-        final Spinner yearSpinner = (Spinner) view.findViewById(R.id.yearSpinner);
-        final Spinner monthSpinner = (Spinner) view.findViewById(R.id.monthSpinner);
-        final Spinner daySpinner = (Spinner) view.findViewById(R.id.daySpinner);
+        Spinner calendarTypeSpinner = (Spinner) view.findViewById(R.id.calendarTypeSpinner);
+        Spinner yearSpinner = (Spinner) view.findViewById(R.id.yearSpinner);
+        Spinner monthSpinner = (Spinner) view.findViewById(R.id.monthSpinner);
+        Spinner daySpinner = (Spinner) view.findViewById(R.id.daySpinner);
 
         utils.setFontAndShape((TextView) view.findViewById(R.id.converterLabelDay));
         utils.setFontAndShape((TextView) view.findViewById(R.id.converterLabelMonth));
@@ -69,38 +69,35 @@ public class SelectDayDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
         builder.setCustomTitle(null);
-        builder.setPositiveButton(R.string.select, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        builder.setPositiveButton(R.string.select, (dialogInterface, i) -> {
 
-                int year = startingYearOnYearSpinner + yearSpinner.getSelectedItemPosition();
-                int month = monthSpinner.getSelectedItemPosition() + 1;
-                int day = daySpinner.getSelectedItemPosition() + 1;
+            int year = startingYearOnYearSpinner + yearSpinner.getSelectedItemPosition();
+            int month = monthSpinner.getSelectedItemPosition() + 1;
+            int day = daySpinner.getSelectedItemPosition() + 1;
 
-                CalendarFragment calendarFragment = (CalendarFragment) getActivity()
-                        .getSupportFragmentManager()
-                        .findFragmentByTag(CalendarFragment.class.getName());
+            CalendarFragment calendarFragment = (CalendarFragment) getActivity()
+                    .getSupportFragmentManager()
+                    .findFragmentByTag(CalendarFragment.class.getName());
 
-                try {
-                    switch (utils.calendarTypeFromPosition(calendarTypeSpinner.getSelectedItemPosition())) {
-                        case GREGORIAN:
-                            calendarFragment.bringDate(DateConverter.civilToPersian(
-                                    new CivilDate(year, month, day)));
-                            break;
+            try {
+                switch (utils.calendarTypeFromPosition(calendarTypeSpinner.getSelectedItemPosition())) {
+                    case GREGORIAN:
+                        calendarFragment.bringDate(DateConverter.civilToPersian(
+                                new CivilDate(year, month, day)));
+                        break;
 
-                        case ISLAMIC:
-                            calendarFragment.bringDate(DateConverter.islamicToPersian(
-                                    new IslamicDate(year, month, day)));
-                            break;
+                    case ISLAMIC:
+                        calendarFragment.bringDate(DateConverter.islamicToPersian(
+                                new IslamicDate(year, month, day)));
+                        break;
 
-                        case SHAMSI:
-                            calendarFragment.bringDate(new PersianDate(year, month, day));
-                            break;
-                    }
-                } catch (RuntimeException e) {
-                    utils.quickToast(getString(R.string.date_exception));
-                    Log.e("SelectDayDialog", "", e);
+                    case SHAMSI:
+                        calendarFragment.bringDate(new PersianDate(year, month, day));
+                        break;
                 }
+            } catch (RuntimeException e) {
+                utils.quickToast(getString(R.string.date_exception));
+                Log.e("SelectDayDialog", "", e);
             }
         });
 
