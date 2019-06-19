@@ -4,11 +4,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.byagowi.persiancalendar.util.UpdateUtils;
-import com.byagowi.persiancalendar.util.Utils;
+import androidx.annotation.Nullable;
+
+import com.byagowi.persiancalendar.utils.UpdateUtils;
+import com.byagowi.persiancalendar.utils.Utils;
 
 import java.lang.ref.WeakReference;
 
@@ -21,6 +22,7 @@ import java.lang.ref.WeakReference;
 public class ApplicationService extends Service {
 
     private static WeakReference<ApplicationService> instance;
+    private final BroadcastReceivers receiver = new BroadcastReceivers();
 
     @Nullable
     public static ApplicationService getInstance() {
@@ -36,20 +38,29 @@ public class ApplicationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         instance = new WeakReference<>(this);
         Log.d(ApplicationService.class.getName(), "start");
-        UpdateUtils updateUtils = UpdateUtils.getInstance(getApplicationContext());
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_DATE_CHANGED);
         intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-        intentFilter.addAction(Intent.ACTION_TIME_TICK);
-        registerReceiver(new BroadcastReceivers(), intentFilter);
+//        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        registerReceiver(receiver, intentFilter);
 
-        Utils utils = Utils.getInstance(getBaseContext());
-        utils.loadApp();
-        updateUtils.update(true);
+        Utils.updateStoredPreference(getApplicationContext());
+        Utils.loadApp(this);
+        UpdateUtils.update(getApplicationContext(), true);
 
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception ignore) {
+            // Really can't do much here
+        }
+        super.onDestroy();
     }
 }
